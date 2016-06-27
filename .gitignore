@@ -1,2 +1,4 @@
 game.lua
 playground/
+test.lua
+*.love
