@@ -31,10 +31,10 @@ end
 function love.load()
 	local font = love.graphics.newFont(40)
 	love.graphics.setFont(font)
-	
-	ldebug.append(function() return ("This game has been running for %.3fs"):format(os.clock()) end)
-	ldebug.append(function() return ("Game Window size is %dx%d"):format(love.graphics.getWidth(), love.graphics.getHeight()) end)
-	ldebug.append(("Operating System: %s"):format(love.system.getOS()))
-	
+
+	ldebug.static(function() return ("This game has been running for %.3fs"):format(os.clock()) end)
+	ldebug.static(function() return ("Game Window size is %dx%d"):format(love.graphics.getWidth(), love.graphics.getHeight()) end)
+	ldebug.static(("Operating System: %s"):format(love.system.getOS()))
+
 	game.load()
 end
