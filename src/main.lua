@@ -1,13 +1,15 @@
 local ldebug = require("misc.debug")
 local game = require("game")
 local state = require("misc.state")
+local config = require("config")
 
+local love = love or {}
 function love.draw()
 	local currstate = state.get()
 	if currstate.draw then
 		currstate:draw()
 	end
-	
+
 	if ldebug.isEnabled() then
 		love.graphics.setColor(255, 255, 255)
 		love.graphics.print(ldebug.get(), 20, 20)
@@ -22,9 +24,24 @@ function love.update(dt)
 end
 
 function love.touchreleased(id, x, y, dx, dy, pressure)
+	if not config.useTouch then
+		return
+	end
+	
 	local currstate = state.get()
 	if currstate.touchreleased then
 		currstate:touchreleased(id, x, y, dx, dy, pressure)
+	end
+end
+
+function love.mousereleased(x, y, button, istouch)
+	if not config.useMouse then
+		return
+	end
+
+	local currstate = state.get()
+	if currstate.touchreleased then
+		currstate:touchreleased(nil, x, y, nil, nil, nil)
 	end
 end
 
