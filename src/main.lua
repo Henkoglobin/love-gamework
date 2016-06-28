@@ -3,6 +3,8 @@ local game = require("game")
 local state = require("misc.state")
 local config = require("config")
 
+local debugFont
+
 local love = love or {}
 function love.draw()
 	local currstate = state.get()
@@ -11,8 +13,11 @@ function love.draw()
 	end
 
 	if ldebug.isEnabled() then
+		love.graphics.push("all")
+		love.graphics.setFont(debugFont)
 		love.graphics.setColor(255, 255, 255)
 		love.graphics.print(ldebug.get(), 20, 20)
+		love.graphics.pop()
 	end
 end
 
@@ -46,8 +51,7 @@ function love.mousereleased(x, y, button, istouch)
 end
 
 function love.load()
-	local font = love.graphics.newFont(40)
-	love.graphics.setFont(font)
+	debugFont = love.graphics.newFont(40)
 
 	ldebug.static(function() return ("This game has been running for %.3fs"):format(os.clock()) end)
 	ldebug.static(function() return ("Game Window size is %dx%d"):format(love.graphics.getWidth(), love.graphics.getHeight()) end)

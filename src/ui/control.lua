@@ -5,6 +5,7 @@ function control.new()
 	return {
 		minWidth = 0,
 		minHeight = 0,
+		__type = "control"
 	}
 end
 
@@ -13,12 +14,16 @@ function control:measure(availableWidth, availableHeight)
 	local measured = false
 
 	if self.onMeasure then
+		print(("%s.onMeasure(%d, %d)"):format(self.__type, availableWidth, availableHeight))
 		self.desiredWidth, self.desiredHeight = self:onMeasure(availableHeight, availableWidth)
+		print(("%s => (%d, %d)"):format(self.__type, self.desiredWidth, self.desiredHeight))
 		measured = true
 	end
 
 	if self.content and not measured then
+		print(("%s.onMeasure(%d, %d)"):format(self.__type, availableWidth, availableHeight))
 		self.desiredWidth, self.desiredHeight = self.content:measure(availableWidth, availableHeight)
+		print(("%s => (%d, %d)"):format(self.__type, self.desiredWidth, self.desiredHeight))
 		measured = true
 	end
 	
@@ -32,6 +37,8 @@ function control:measure(availableWidth, availableHeight)
 	self.desiredHeight = self.verticalAlignment == "stretch"
 		and availableHeight
 		or math.min(availableHeight, math.max(self.minHeight, self.desiredHeight))
+
+	print(("%s final => (%d, %d)"):format(self.__type, self.desiredWidth, self.desiredHeight))
 
 	return self.desiredWidth, self.desiredHeight
 end

@@ -20,6 +20,7 @@ function uistate:draw()
 	if self.needsMeasure then
 		self.content:measure(width, height)
 		self.content:arrange(0, 0, width, height)
+		self.needsMeasure = false
 	end
 	
 	self.content:render(0, 0, width, height)
