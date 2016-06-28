@@ -1,5 +1,5 @@
 local config = {
-	useTouch = false
+	useTouch = false,
 	useMouse = true
 }
 
