@@ -51,7 +51,7 @@ function love.mousereleased(x, y, button, istouch)
 end
 
 function love.load()
-	debugFont = love.graphics.newFont(40)
+	debugFont = love.graphics.newFont(10)
 
 	ldebug.static(function() return ("This game has been running for %.3fs"):format(os.clock()) end)
 	ldebug.static(function() return ("Game Window size is %dx%d"):format(love.graphics.getWidth(), love.graphics.getHeight()) end)

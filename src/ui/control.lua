@@ -1,4 +1,5 @@
 local class = require("misc.class")
+local parser = require("ui.parser")
 local control = class()
 
 function control.new()
@@ -7,13 +8,19 @@ function control.new()
 		minHeight = 0,
 		padding = { 0, 0, 0, 0 },
 		margin = { 0, 0, 0, 0 },
-		__type = "control"
+		__type = "control",
+		horizontalAlignment = "start",
+		verticalAlignment = "start"
 	}
 end
 
 function control:measure(availableWidth, availableHeight)
 	local width, height = 0, 0
 	local measured = false
+
+	if self.style and not self.content then
+		self.content = parser.parse(self.style)
+	end
 
 	availableWidth = availableWidth - self.margin[1] - self.margin[3]
 	availableHeight = availableHeight - self.margin[2] - self.margin[4]
@@ -36,8 +43,8 @@ function control:measure(availableWidth, availableHeight)
 		self.desiredWidth, self.desiredHeight = 0, 0
 	end
 
-	self.desiredWidth = self.desiredWidth + self.padding[1] + self.padding[3]
-	self.desiredHeight = self.desiredHeight + self.padding[2] + self.padding[4]
+	self.desiredWidth = self.desiredWidth + self.padding[1] + self.padding[3] + self.margin[1] + self.margin[3]
+	self.desiredHeight = self.desiredHeight + self.padding[2] + self.padding[4] + self.margin[2] + self.margin[4]
 
 	self.desiredWidth = self.horizontalAlignment == "stretch"
 		and availableWidth 
@@ -56,13 +63,11 @@ function control:arrange(x, y, width, height)
 	local actualWidth, offsetX = getActualDimensionAndOffset(self.horizontalAlignment, self.desiredWidth, width, self.margin[1], self.margin[3])
 	local actualHeight, offsetY = getActualDimensionAndOffset(self.verticalAlignment, self.desiredHeight, height, self.margin[2], self.margin[4])
 
-	print(("%s without padding {%d, %d, %d, %d}"):format(self.__type, offsetX, offsetY, actualWidth, actualHeight))
-
 	local rect = {
-		x = x + offsetX + self.padding[1], 
-		y = y + offsetY + self.padding[2], 
-		w = actualWidth - self.padding[1] - self.padding[3], 
-		h = actualHeight - self.padding[2] - self.padding[4]
+		x = x + offsetX,
+		y = y + offsetY,
+		w = actualWidth,
+		h = actualHeight
 	}
 
 	print(("%s is layed out { %d, %d, %d, %d }"):format(self.__type, rect.x, rect.y, rect.w, rect.h))
@@ -83,11 +88,13 @@ getActualDimensionAndOffset = function(alignment, desired, available, marginStar
 	if alignment == "stretch" then
 		return available - marginStart - marginEnd, marginStart
 	elseif alignment == "start" then
-		return desired, marginStart - marginEnd
+		return desired, marginStart
 	elseif alignment == "center" then
-		return desired, math.floor((available - desired) / 2) + marginStart - marginEnd
+		return desired, math.floor((available - desired) / 2) + marginStart
 	elseif alignment == "end" then
-		return desired, available - desired + marginStart - marginEnd
+		return desired, available - desired - marginEnd
+	else
+		error(("Invalid alignment %s"):format(alignment), 3)
 	end
 end
 

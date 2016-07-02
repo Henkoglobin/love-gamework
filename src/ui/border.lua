@@ -5,7 +5,9 @@ local border = class(control)
 
 function border.new()
 	return {
-		__type = "border"
+		__type = "border",
+		borderColor = { 0, 0, 0, 255 },
+		borderWidth = 1
 	}
 end
 
