@@ -3,7 +3,7 @@ local label = require("ui.label")
 
 return {
 	border,
-	backgroundColor = { 100, 149, 237 },
+	backgroundColor = { 128, 128, 128 },
 	padding = { 40, 40, 40, 40 },
 	content = {
 		label,

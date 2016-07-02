@@ -57,5 +57,7 @@ function love.load()
 	ldebug.static(function() return ("Game Window size is %dx%d"):format(love.graphics.getWidth(), love.graphics.getHeight()) end)
 	ldebug.static(("Operating System: %s"):format(love.system.getOS()))
 
+	love.graphics.setBackgroundColor(100, 149, 237)
+
 	game.load()
 end

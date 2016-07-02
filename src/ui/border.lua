@@ -7,6 +7,7 @@ function border.new()
 	return {
 		__type = "border",
 		borderColor = { 0, 0, 0, 255 },
+		backgroundColor = { 0, 0, 0, 0 },
 		borderWidth = 1
 	}
 end
