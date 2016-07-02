@@ -15,6 +15,9 @@ function control:measure(availableWidth, availableHeight)
 	local width, height = 0, 0
 	local measured = false
 
+	availableWidth = availableWidth - self.margin[1] - self.margin[3]
+	availableHeight = availableHeight - self.margin[2] - self.margin[4]
+
 	if self.onMeasure then
 		print(("%s.onMeasure(%d, %d)"):format(self.__type, availableWidth, availableHeight))
 		self.desiredWidth, self.desiredHeight = self:onMeasure(availableHeight, availableWidth)
@@ -55,8 +58,8 @@ function control:arrange(x, y, width, height)
 		return
 	end
 
-	local actualWidth, offsetX = getActualDimensionAndOffset(self.horizontalAlignment, self.desiredWidth, width)
-	local actualHeight, offsetY = getActualDimensionAndOffset(self.verticalAlignment, self.desiredHeight, height)
+	local actualWidth, offsetX = getActualDimensionAndOffset(self.horizontalAlignment, self.desiredWidth, width, self.margin[1], self.margin[3])
+	local actualHeight, offsetY = getActualDimensionAndOffset(self.verticalAlignment, self.desiredHeight, height, self.margin[2], self.margin[4])
 
 	print(("%s without padding {%d, %d, %d, %d}"):format(self.__type, offsetX, offsetY, actualWidth, actualHeight))
 
@@ -76,15 +79,15 @@ function control:arrange(x, y, width, height)
 	self.layoutRect = rect
 end
 
-getActualDimensionAndOffset = function(alignment, desired, available)
+getActualDimensionAndOffset = function(alignment, desired, available, marginStart, marginEnd)
 	if alignment == "stretch" then
-		return available, 0
+		return available - marginStart - marginEnd, marginStart
 	elseif alignment == "start" then
-		return desired, 0
+		return desired, marginStart - marginEnd
 	elseif alignment == "center" then
-		return desired, math.floor((available - desired) / 2)
+		return desired, math.floor((available - desired) / 2) + marginStart - marginEnd
 	elseif alignment == "end" then
-		return desired, available - desired
+		return desired, available - desired + marginStart - marginEnd
 	end
 end
 
