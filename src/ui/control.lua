@@ -5,6 +5,8 @@ function control.new()
 	return {
 		minWidth = 0,
 		minHeight = 0,
+		padding = { 0, 0, 0, 0 },
+		margin = { 0, 0, 0, 0 },
 		__type = "control"
 	}
 end
@@ -31,6 +33,9 @@ function control:measure(availableWidth, availableHeight)
 		self.desiredWidth, self.desiredHeight = 0, 0
 	end
 
+	self.desiredWidth = self.desiredWidth + self.padding[1] + self.padding[3]
+	self.desiredHeight = self.desiredHeight + self.padding[2] + self.padding[4]
+
 	self.desiredWidth = self.horizontalAlignment == "stretch"
 		and availableWidth 
 		or math.min(availableWidth, math.max(self.minWidth, self.desiredWidth))
@@ -47,15 +52,28 @@ local getActualDimensionAndOffset
 function control:arrange(x, y, width, height)
 	if self.onArrange then
 		self.layoutRect = self:onArrange(x, y, width, height)
+		return
 	end
 
 	local actualWidth, offsetX = getActualDimensionAndOffset(self.horizontalAlignment, self.desiredWidth, width)
 	local actualHeight, offsetY = getActualDimensionAndOffset(self.verticalAlignment, self.desiredHeight, height)
 
-	self.layoutRect = { x = offsetX, y = offsetY, w = actualWidth, h = actualHeight }
+	print(("%s without padding {%d, %d, %d, %d}"):format(self.__type, offsetX, offsetY, actualWidth, actualHeight))
+
+	local rect = {
+		x = x + offsetX + self.padding[1], 
+		y = y + offsetY + self.padding[2], 
+		w = actualWidth - self.padding[1] - self.padding[3], 
+		h = actualHeight - self.padding[2] - self.padding[4]
+	}
+
+	print(("%s is layed out { %d, %d, %d, %d }"):format(self.__type, rect.x, rect.y, rect.w, rect.h))
+
 	if self.content then
-		self.content:arrange(x, y, width, height)
+		self.content:arrange(rect.x, rect.y, rect.w, rect.h)
 	end
+
+	self.layoutRect = rect
 end
 
 getActualDimensionAndOffset = function(alignment, desired, available)
