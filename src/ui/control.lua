@@ -73,7 +73,11 @@ function control:arrange(x, y, width, height)
 	print(("%s is layed out { %d, %d, %d, %d }"):format(self.__type, rect.x, rect.y, rect.w, rect.h))
 
 	if self.onArrange then
-		self.layoutRect = self:onArrange(rect.x, rect.y, rect.w, rect.h)
+		self.layoutRect = { self:onArrange(rect.x, rect.y, rect.w, rect.h) }
+		if #self.layoutRect ~= 4 then
+			error(("%s:onArrange() returned an invalid amount of values. Expected: 4, actual: %d"):format(self.__type, #self.layoutRect))
+		end
+
 		return
 	end
 
