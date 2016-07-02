@@ -53,11 +53,6 @@ end
 
 local getActualDimensionAndOffset
 function control:arrange(x, y, width, height)
-	if self.onArrange then
-		self.layoutRect = self:onArrange(x, y, width, height)
-		return
-	end
-
 	local actualWidth, offsetX = getActualDimensionAndOffset(self.horizontalAlignment, self.desiredWidth, width, self.margin[1], self.margin[3])
 	local actualHeight, offsetY = getActualDimensionAndOffset(self.verticalAlignment, self.desiredHeight, height, self.margin[2], self.margin[4])
 
@@ -71,6 +66,11 @@ function control:arrange(x, y, width, height)
 	}
 
 	print(("%s is layed out { %d, %d, %d, %d }"):format(self.__type, rect.x, rect.y, rect.w, rect.h))
+
+	if self.onArrange then
+		self.layoutRect = self:onArrange(rect.x, rect.y, rect.w, rect.h)
+		return
+	end
 
 	if self.content then
 		self.content:arrange(rect.x, rect.y, rect.w, rect.h)
