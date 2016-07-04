@@ -90,10 +90,12 @@ end
 function debug.get()
 	local result = {}
 
+--if DEBUG
 	local bound = config.static == "*" and #static or math.min(config.static, #static)
 	for j = 1, bound do
 		table.insert(result, static[j]())
 	end
+--endif
 
 	for _, stream in ipairs({ wtf, i, d, v }) do
 		for _, line in ipairs(stream) do

@@ -1,4 +1,4 @@
-project=$(cat project)
+project=$(tools/readtable.lua project.lua project.name)
 
 echo Deleting $project.love...
 rm $project.love
