@@ -1,5 +1,6 @@
 local border = require("ui.border")
 local label = require("ui.label")
+local templateBinding = require("ui.bindings.templateBinding")
 
 return {
 	border,
@@ -9,6 +10,6 @@ return {
 		label,
 		horizontalAlignment = "center",
 		verticalAlignment = "center",
-		text = "Button 1"
+		text = {templateBinding, path = "text" }
 	}
 }

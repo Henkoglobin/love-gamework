@@ -1,4 +1,5 @@
 local tableutil = require("misc.tableutil")
+local object = require("misc.object")
 
 local class = setmetatable({}, {
 	__call = function(self, ...)
@@ -8,8 +9,8 @@ local class = setmetatable({}, {
 class.__index = class
 
 local isClass
-function class.new(inherit)
-	inherit = inherit or {}
+function class.new(name, inherit)
+	inherit = inherit or object
 	local newClass = setmetatable({}, inherit)
 	inherit.__call = function(self, proto, ...)
 		local inst
@@ -28,10 +29,11 @@ function class.new(inherit)
 		return setmetatable(inst, self)
 	end
 	newClass.__index = newClass
+	newClass.__type = name
 	return newClass
 end
 
-function isClass(value)
+isClass = function(value)
 	local mt = getmetatable(value)
 	return mt and mt.__call
 end

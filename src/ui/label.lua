@@ -1,22 +1,21 @@
 local class = require("misc.class")
 local control = require("ui.control")
 
-local label = class(control)
+local label = class("label", control)
 
 function label.new()
 	return {
 		foregroundColor = { 255, 255, 255, 255 },	-- rgba
-		text = "",
+		text = "<empty>",
 		fontSize = 20,
 		__fontSize = 20,
-		font = love.graphics.newFont(20),
-		__type = "label"
+		font = love and love.graphics.newFont(20)
 	}
 end
 
 function label:onMeasure(availableWidth, availableHeight)
 	if self.fontSize ~= self.__fontSize then
-		self.font = love.graphics.newFont(self.fontSize)
+		self.font = love and love.graphics.newFont(self.fontSize)
 		self.__fontSize = self.fontSize
 	end
 	

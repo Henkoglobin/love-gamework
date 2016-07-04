@@ -1,11 +1,10 @@
 local class = require("misc.class")
 local control = require("ui.control")
 
-local border = class(control)
+local border = class("border", control)
 
 function border.new()
 	return {
-		__type = "border",
 		borderColor = { 0, 0, 0, 255 },
 		backgroundColor = { 0, 0, 0, 0 },
 		borderWidth = 1

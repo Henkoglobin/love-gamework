@@ -1,11 +1,10 @@
 local control = require("ui.control")
 local class = require("misc.class")
 
-local stackPanel = class(control)
+local stackPanel = class("stackPanel", control)
 
 function stackPanel.new()
 	return {
-		__type = "stackPanel",
 		orientation = "vertical"
 	}
 end

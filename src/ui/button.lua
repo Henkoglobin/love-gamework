@@ -1,7 +1,7 @@
 local control = require("ui.control")
 local class = require("misc.class")
 
-local button = class(control)
+local button = class("button", control)
 
 function button.new(...)
 	return {

@@ -1,6 +1,8 @@
 local class = require("misc.class")
 local parser = require("ui.parser")
-local control = class()
+local treeUtil = require("ui.util.treeUtil")
+
+local control = class("control")
 
 function control.new()
 	return {
@@ -8,10 +10,30 @@ function control.new()
 		minHeight = 0,
 		padding = { 0, 0, 0, 0 },
 		margin = { 0, 0, 0, 0 },
-		__type = "control",
 		horizontalAlignment = "start",
-		verticalAlignment = "start"
+		verticalAlignment = "start",
+		__bindings = {}
 	}
+end
+
+local updateBindings
+function control:addBinding(property, binding)
+	self.__bindings[property] = binding
+	updateBindings(self)
+end
+
+function control:setTemplateBindingTarget(targetControl)
+	print("template Binding Target set")
+	self.__templateBindingTarget = targetControl
+	updateBindings(self)
+end
+
+updateBindings = function(self)
+	if self.__templateBindingTarget then
+		for prop, binding in pairs(self.__bindings or {}) do
+			self[prop] = binding:provide(self.__templateBindingTarget)
+		end
+	end
 end
 
 function control:measure(availableWidth, availableHeight)
@@ -20,6 +42,11 @@ function control:measure(availableWidth, availableHeight)
 
 	if self.style and not self.content then
 		self.content = parser.parse(self.style)
+
+		treeUtil.traverseChildren(self, treeUtil.visualTreePredicate, 
+			function(element)
+				element:setTemplateBindingTarget(self)
+			end)
 	end
 
 	availableWidth = availableWidth - self.margin[1] - self.margin[3]
