@@ -1,5 +1,6 @@
 local object = {}
 object.__index = object
+object.__type = "object"
 
 function object:getClass()
 	return getmetatable(self)
