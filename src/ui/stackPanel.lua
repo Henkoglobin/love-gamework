@@ -19,6 +19,7 @@ function stackPanel:onMeasure(availableWidth, availableHeight)
 			getOther(self, availableWidth, availableHeight)
 		)
 		
+		child.parent = self
 		child:measure(childWidth, childHeight)
 		usedLength = usedLength + getLength(self, child.desiredWidth, child.desiredHeight)
 		maxOther = math.max(maxOther, getOther(self, child.desiredWidth, child.desiredHeight))
@@ -71,6 +72,14 @@ end
 function stackPanel:onRender()
 	for k, child in pairs(self.children) do
 		child:render()
+	end
+end
+
+function stackPanel:onTouch(id, x, y, dx, dy, pressure)
+	for k, child in pairs(self.children) do
+		if child:touch(id, x, y, dx, dy, pressure) then
+			return
+		end
 	end
 end
 

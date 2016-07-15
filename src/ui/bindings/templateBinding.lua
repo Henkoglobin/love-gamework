@@ -10,9 +10,7 @@ function templateBinding.new()
 end
 
 function templateBinding:provide(target)
-	print("[PROVIDE]")
 	for pathSpec in self.path:gmatch("[^%.]+") do
-		print("[PROVIDE] " .. pathSpec)
 		target = target[pathSpec]
 		if target == nil then 
 			return self.fallback

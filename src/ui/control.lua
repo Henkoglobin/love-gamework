@@ -1,6 +1,7 @@
 local class = require("misc.class")
 local parser = require("ui.parser")
 local treeUtil = require("ui.util.treeUtil")
+local rectUtil = require("ui.util.rectUtil")
 
 local control = class("control")
 
@@ -23,7 +24,6 @@ function control:addBinding(property, binding)
 end
 
 function control:setTemplateBindingTarget(targetControl)
-	print("template Binding Target set")
 	self.__templateBindingTarget = targetControl
 	updateBindings(self)
 end
@@ -53,16 +53,13 @@ function control:measure(availableWidth, availableHeight)
 	availableHeight = availableHeight - self.margin[2] - self.margin[4]
 
 	if self.onMeasure then
-		print(("%s.onMeasure(%d, %d)"):format(self.__type, availableWidth, availableHeight))
 		self.desiredWidth, self.desiredHeight = self:onMeasure(availableHeight, availableWidth)
-		print(("%s => (%d, %d)"):format(self.__type, self.desiredWidth, self.desiredHeight))
 		measured = true
 	end
 
 	if self.content and not measured then
-		print(("%s.onMeasure(%d, %d)"):format(self.__type, availableWidth, availableHeight))
+		self.content.parent = self
 		self.desiredWidth, self.desiredHeight = self.content:measure(availableWidth, availableHeight)
-		print(("%s => (%d, %d)"):format(self.__type, self.desiredWidth, self.desiredHeight))
 		measured = true
 	end
 	
@@ -80,8 +77,6 @@ function control:measure(availableWidth, availableHeight)
 		and availableHeight
 		or math.min(availableHeight, math.max(self.minHeight, self.desiredHeight))
 
-	print(("%s final => (%d, %d)"):format(self.__type, self.desiredWidth, self.desiredHeight))
-
 	return self.desiredWidth, self.desiredHeight
 end
 
@@ -97,13 +92,18 @@ function control:arrange(x, y, width, height)
 		h = actualHeight
 	}
 
-	print(("%s is layed out { %d, %d, %d, %d }"):format(self.__type, rect.x, rect.y, rect.w, rect.h))
-
 	if self.onArrange then
-		self.layoutRect = { self:onArrange(rect.x, rect.y, rect.w, rect.h) }
-		if #self.layoutRect ~= 4 then
-			error(("%s:onArrange() returned an invalid amount of values. Expected: 4, actual: %d"):format(self.__type, #self.layoutRect))
+		local rect = { self:onArrange(rect.x, rect.y, rect.w, rect.h) }
+		if #rect ~= 4 then
+			error(("%s:onArrange() returned an invalid amount of values. Expected: 4, actual: %d"):format(self.__type, #rect))
 		end
+
+		self.layoutRect = {
+			x = rect[1],
+			y = rect[2],
+			w = rect[3],
+			h = rect[4]
+		}
 
 		return
 	end
@@ -125,7 +125,7 @@ getActualDimensionAndOffset = function(alignment, desired, available, marginStar
 	elseif alignment == "end" then
 		return desired, available - desired - marginEnd
 	else
-		error(("Invalid alignment %s"):format(alignment), 3)
+		error(("Invalid alignment '%s', expected: 'start', 'center', 'end' or 'stretch'"):format(alignment), 3)
 	end
 end
 
@@ -134,9 +134,33 @@ function control:render()
 	if self.onRender then
 		self:onRender(rect.x, rect.y, rect.w, rect.h)
 	end
-	
+
 	if self.content then
 		self.content:render(rect.x, rect.y, rect.w, rect.h)
+	end
+end
+
+function control:touch(id, x, y, dx, dy, pressure)
+	local rect = self.layoutRect
+
+	if not rectUtil.isInRect(self.layoutRect, x, y) then
+		return false
+	end
+
+	if self.onTouch then
+		return self:onTouch(id, x, y, dx, dy, pressure)
+	end
+
+	if self.content then
+		return self.content:touch(id, x, y, dx, dy, pressure)
+	end
+
+	return false
+end
+
+function control:invalidate()
+	if self.parent then
+		self.parent:invalidate()
 	end
 end
 

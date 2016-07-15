@@ -22,6 +22,7 @@ function parser.parse(input)
 		if (not instanceFromClass or prop ~= 1) and (type(prop) ~= "string" or not prop:find("^__")) then
 			if type(value) == "table" then
 				value = parser.parse(value)
+
 				if object.isInstanceOf(value, binding) then
 					instance:addBinding(prop, value)
 				else

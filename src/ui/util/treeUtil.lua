@@ -8,7 +8,6 @@ treeUtil.visualTreePredicate = function(element)
 end
 
 function treeUtil.traverseChildren(element, predicate, callback)
-	print("Traversing " .. tostring(element))
 	if not control then
 		control = require("ui.control")
 	end
@@ -24,7 +23,7 @@ function treeUtil.traverseChildren(element, predicate, callback)
 				callback(value)
 			end
 			
-			if type(value) == "table" then
+			if type(value) == "table" and property ~= "parent" then
 				treeUtil.traverseChildren(value, predicate, callback)
 			end
 		end
