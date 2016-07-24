@@ -53,7 +53,7 @@ function control:measure(availableWidth, availableHeight)
 	availableHeight = availableHeight - self.margin[2] - self.margin[4]
 
 	if self.onMeasure then
-		self.desiredWidth, self.desiredHeight = self:onMeasure(availableHeight, availableWidth)
+		self.desiredWidth, self.desiredHeight = self:onMeasure(availableWidth, availableHeight)
 		measured = true
 	end
 
