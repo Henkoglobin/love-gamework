@@ -1,0 +1,3 @@
+[submodule "src/lib/lazylualinq"]
+	path = src/lib/lazylualinq
+	url = git@github.com:Henkoglobin/lazylualinq.git
