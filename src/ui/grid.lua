@@ -116,6 +116,24 @@ function grid:onRender()
 	for _, child in pairs(self.children) do
 		child:render()
 	end
+
+--if DEBUG
+	love.graphics.push("all")
+	love.graphics.setColor(255, 255, 255, 255)
+	local tw = 0
+	for i, w in pairs(self.colWidths) do
+		tw = tw + w
+
+		love.graphics.line(tw, 0, tw, love.graphics.getHeight())
+	end
+
+	local th = 0
+	for i, h in pairs(self.rowHeights) do
+		th = th + h
+		love.graphics.line(0, th, love.graphics.getWidth(), th)
+	end
+	love.graphics.pop()
+--endif
 end
 
 parseLength = function(length)
