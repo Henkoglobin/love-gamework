@@ -27,10 +27,30 @@ function class.new(name, inherit)
 
 		return setmetatable(inst, self)
 	end
-	newClass.__index = newClass
+
 	newClass.__type = name
 	newClass.__tostring = function(self)
 		return ("%s { } : %s"):format(newClass.__type, tostring(getmetatable(self)))
+	end
+
+	if inherit and type(inherit.__index) == "function" then
+--if DEBUG
+		print(("%s will have a custom __index"):format(name))
+--endif
+
+		newClass.__index = inherit.__index
+	else
+		newClass.__index = newClass
+	end
+
+	if inherit and inherit.__newindex then
+--if DEBUG
+		print(("%s will have a custom __newindex"):format(name))
+--endif
+
+		newClass.__newindex = function(self, key, value)
+			inherit.__newindex(self, key, value)
+		end
 	end
 	return newClass
 end
@@ -42,7 +62,9 @@ end
 
 local propertyIndex, propertyNewIndex
 function class.property(cls, name, config)
+--if DEBUG
 	print(("Creating property %s for %s"):format(name, cls.__type))
+--endif
 	local props = rawget(cls, "__properties")
 	if not props then
 		rawset(cls, "__properties", {})
@@ -50,12 +72,18 @@ function class.property(cls, name, config)
 
 	cls.__properties[name] = config
 	cls.__index = propertyIndex
-	cls.__newindex = propertyNewIndex
+	if config.set then
+--if DEBUG
+		print(("Setting __newindex on %s.%s because of setter!"):format(cls.__type, name))
+--endif
+
+		cls.__newindex = propertyNewIndex
+	end
 end
 
+local findProperty
 propertyIndex = function(self, key)
-	local props = rawget(getmetatable(self), "__properties")
-	local prop = props and props[key]
+	local prop = findProperty(self, key)
 
 	if prop then
 		return prop.get(self)
@@ -65,13 +93,24 @@ propertyIndex = function(self, key)
 end
 
 propertyNewIndex = function(self, key, value)
-	local props = rawget(getmetatable(self), "__properties")
-	local prop = props and props[key]
+	local prop = findProperty(self, key)
 
 	if prop then
 		prop.set(self, value)
 	else
 		rawset(self, key, value)
+	end
+end
+
+findProperty = function(tbl, property)
+	local mt = getmetatable(tbl)
+	if mt then
+		local props = rawget(mt, "__properties")
+		if props and props[property] then
+			return props[property]
+		end
+
+		return findProperty(mt, property)
 	end
 end
 

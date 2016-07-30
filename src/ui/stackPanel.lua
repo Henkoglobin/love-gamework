@@ -19,7 +19,7 @@ function stackPanel:onMeasure(availableWidth, availableHeight)
 			getOther(self, availableWidth, availableHeight)
 		)
 		
-		child.parent = self
+		child:setParent(self)
 		child:measure(childWidth, childHeight)
 		usedLength = usedLength + getLength(self, child.desiredWidth, child.desiredHeight)
 		maxOther = math.max(maxOther, getOther(self, child.desiredWidth, child.desiredHeight))

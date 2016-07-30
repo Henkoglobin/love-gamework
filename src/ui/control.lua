@@ -2,6 +2,8 @@ local class = require("misc.class")
 local parser = require("ui.parser")
 local treeUtil = require("ui.util.treeUtil")
 local rectUtil = require("ui.util.rectUtil")
+local templateBinding = require("ui.bindings.templateBinding")
+local dataBinding = require("ui.bindings.dataBinding")
 
 local control = class("control")
 
@@ -17,8 +19,44 @@ function control.new()
 	}
 end
 
+class.property(control, "dataContext", {
+	get = function(self)
+		print(("Getting dataContext... parent is set: %s"):format(self.parent ~= nil))
+		return self.parent and self.parent.dataContext
+	end
+})
+
+class.property(control, "dataContextStack", {
+	get = function(self)
+		return setmetatable({}, {
+			__index = function(self, index)
+				if type(index) ~= "number" then
+					return nil
+				end
+
+				local obj = self
+				while obj and index > 0 do
+					if obj.__dataContext then
+						index = index - 1
+						if index == 0 then
+							return obj.__dataContext
+						end
+						obj = obj.parent
+					end
+				end
+			end
+		})
+	end
+})
+
 local updateBindings
+function control:setDataContext(context)
+	self.dataContext = context
+	updateBindings(self)
+end
+
 function control:addBinding(property, binding)
+	print(("Added binding on %s"):format(property))
 	self.__bindings[property] = binding
 	updateBindings(self)
 end
@@ -29,11 +67,25 @@ function control:setTemplateBindingTarget(targetControl)
 end
 
 updateBindings = function(self)
-	if self.__templateBindingTarget then
-		for prop, binding in pairs(self.__bindings or {}) do
-			self[prop] = binding:provide(self.__templateBindingTarget)
+	for prop, binding in pairs(self.__bindings or {}) do
+		if binding:instanceOf(templateBinding) then
+			if self.__templateBindingTarget then
+				self[prop] = binding:provide(self.__templateBindingTarget)
+			end
+		elseif binding:instanceOf(dataBinding) then
+			local dataContext = self.dataContext
+			if dataContext then
+				self[prop] = binding:provide(dataContext)
+			else
+				print("... but dataContext was nil")
+			end
 		end
 	end
+end
+
+function control:setParent(parent)
+	self.parent = parent
+	updateBindings(self)
 end
 
 function control:measure(availableWidth, availableHeight)
@@ -58,7 +110,7 @@ function control:measure(availableWidth, availableHeight)
 	end
 
 	if self.content and not measured then
-		self.content.parent = self
+		self.content:setParent(self)
 		self.desiredWidth, self.desiredHeight = self.content:measure(availableWidth, availableHeight)
 		measured = true
 	end
