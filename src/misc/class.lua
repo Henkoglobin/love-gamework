@@ -8,7 +8,6 @@ local class = setmetatable({}, {
 })
 class.__index = class
 
-local isClass
 function class.new(name, inherit)
 	inherit = inherit or object
 	local newClass = setmetatable({}, inherit)
@@ -16,7 +15,7 @@ function class.new(name, inherit)
 		local inst
 		local parent = getmetatable(self)
 
-		if isClass(parent) then
+		if class.isClass(parent) then
 			inst = parent(proto, ...)
 		else
 			inst = tableutil.copy(proto or {})
@@ -36,9 +35,9 @@ function class.new(name, inherit)
 	return newClass
 end
 
-isClass = function(value)
+function class.isClass(value)
 	local mt = getmetatable(value)
-	return mt and mt.__call
+	return mt and rawget(mt, "__call") and rawget(value, "__type")
 end
 
 local propertyIndex, propertyNewIndex

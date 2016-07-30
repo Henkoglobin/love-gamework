@@ -11,7 +11,7 @@ function object:instanceOf(other)
 end
 
 function object.isObject(obj)
-	return type(obj) == "table" and obj.instanceOf and obj:instanceOf(object)
+	return type(obj) == "table" and obj.instanceOf and obj:instanceOf(object) and not rawget(obj, "__type")
 end
 
 function object.isInstanceOf(obj, class)
