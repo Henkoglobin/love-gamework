@@ -1,0 +1,18 @@
+image: henkoglobin/love-gamework-ci
+
+stages:
+  - build
+
+build-debug:
+  stage: build
+  script: lua ./build.lua debug
+  artifacts:
+    paths:
+      - gamework_debug.love
+
+build-release:
+  stage: build
+  script: lua ./build.lua release
+  artifacts:
+    paths:
+      - gamework_release.love
