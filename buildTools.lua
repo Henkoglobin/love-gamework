@@ -2,13 +2,13 @@ local lfs = require("lfs")
 
 local buildTools = {}
 
-local processFile, getOutputFile, ensurePathExists
-function buildTools.processSourceFiles(profile)
+local processFile, getOutputFile
+function buildTools.processSourceFiles(profile, profileName)
 	local allFiles = buildTools.findFiles("src")
 
 	for _, file in pairs(allFiles) do
-		local outFile = getOutputFile(file)
-		ensurePathExists(outFile)
+		local outFile = getOutputFile(file, profileName)
+		buildTools.ensurePathExists(outFile)
 
 		if file:match("%.lua$") then
 			local f = assert(io.open(outFile, "w"))
@@ -42,7 +42,7 @@ end
 
 function buildTools.findDirectories(path)
 	local directories = {}
-	
+
 	for file in lfs.dir(path) do
 		if not file:match("%.") then
 			local filePath = path .. "/" .. file
@@ -55,12 +55,12 @@ function buildTools.findDirectories(path)
 			end
 		end
 	end
-	
+
 	return directories
 end
 
-getOutputFile = function(input)
-	return input:gsub("src/", "build/", 1)
+getOutputFile = function(input, profileName)
+	return input:gsub("src/", ("build/%s/"):format(profileName), 1)
 end
 
 local commentOut
@@ -68,7 +68,7 @@ processFile = function(file, profile)
 	local f = io.open(file)
 	local content = f:read("*a")
 	f:close()
-	
+
 	return (content:gsub("(%-%-if (.-)\n.-%-%-endif)",
 		function (codeblock, condition)
 			local chunk = assert(load(("return %s"):format(condition), "chunk", "t", profile.defines))
@@ -85,7 +85,7 @@ end
 local getLineBreak
 commentOut = function(text)
 	local lineBreak = getLineBreak(text)
-	
+
 	return text:gsub(("%s([^\r\n]+)"):format(lineBreak), 
 		function(line)
 			if line:match("--endif") then
@@ -104,7 +104,7 @@ getLineBreak = function(sample)
 			or  "\n"
 end
 
-ensurePathExists = function(filePath)
+function buildTools.ensurePathExists(filePath)
 	local dirPath = filePath:match("^(.+)/[^/]*")
 	local checkedPath = ""
 	for dirSpec in dirPath:gmatch("[^/]+/?") do
