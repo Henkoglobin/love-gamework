@@ -7,7 +7,7 @@ build-debug:
   stage: build
   script: lua ./build.lua debug
   artifacts:
-    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}_debug"
+    name: "gamework_${CI_BUILD_REF_NAME}_${CI_BUILD_NAME}"
     paths:
       - gamework_debug.love
 
@@ -15,6 +15,6 @@ build-release:
   stage: build
   script: lua ./build.lua release
   artifacts:
-    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}_release"
+    name: "gamework_${CI_BUILD_REF_NAME}_${CI_BUILD_NAME}"
     paths:
       - gamework_release.love
