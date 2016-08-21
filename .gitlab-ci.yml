@@ -1,7 +1,14 @@
 image: henkoglobin/love-gamework-ci
 
 stages:
+  - test
   - build
+
+test:
+  stage: test
+  before_script:
+    - git submodule update --init
+  script: lua ./test.lua
 
 build-debug:
   stage: build
