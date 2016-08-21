@@ -1,7 +1,6 @@
 local from = require("lib.lazylualinq.linq")
 local class = require("misc.class")
 local control = require("ui.control")
-local serialize = require("misc.serialize")
 
 local grid = class("grid", control)
 
@@ -94,10 +93,6 @@ function grid:onMeasure(availableWidth, availableHeight)
 	
 	self.colWidths, self.rowHeights = colWidths, rowHeights
 	
-	print(("wxh: %s x %s"):format(availableWidth, availableHeight))
-	print(serialize(colWidths, "colWidths"))
-	print(serialize(rowHeights, "rowHeights"))
-	
 	return from(self.colWidths):sum(), from(self.rowHeights):sum()
 end
 
@@ -140,7 +135,6 @@ function grid:onRender()
 end
 
 parseLength = function(length)
-	print(("parseLength(%s)"):format(length))
 	if type(length) == "string" then
 		if length == "auto" then
 			return { length = -1, mode = "auto" }
